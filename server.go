@@ -9,10 +9,9 @@ import (
 )
 
 var (
-	clean               = false
-	characterCollection *mgo.Collection
-	counterCollection   *mgo.Collection
-	counter             Counter
+	clean   = false
+	DB      *mgo.Database
+	counter Counter
 )
 
 func main() {
@@ -26,28 +25,24 @@ func main() {
 	defer session.Close()
 
 	session.SetMode(mgo.Monotonic, true)
+	DB = session.DB("aepi-ak-booth-2016")
 
-	// When clean is true, it resets the DB on run
+	// If clean is true, drop the database and reset the auto-incrementing sequence
 	if clean {
-		err = session.DB("aepi-ak-booth-2016").DropDatabase()
+		err = DB.DropDatabase()
 		if err != nil {
 			panic(err)
 		}
-	}
 
-	characterCollection = session.DB("aepi-ak-booth-2016").C("people")
-	counterCollection = session.DB("aepi-ak-booth-2016").C("counter")
-
-	// Initialize Counter if starting a clean DB
-	if clean {
-		err = counterCollection.Insert(&Counter{ID: "isaacsucks", Seq: 0})
+		err = DB.C("counter").Insert(&Counter{ID: "isaacsucks", Seq: 0})
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	if err != nil {
 		panic(err)
 	}
 
-	router := NewRouter()
-
-	log.Fatal(http.ListenAndServe(":8000", router))
+	log.Fatal(http.ListenAndServe(":8000", NewRouter()))
 }

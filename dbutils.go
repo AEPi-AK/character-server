@@ -13,7 +13,7 @@ func GetNextCharacterNum() int {
 		Update:    bson.M{"$inc": bson.M{"count": 1}},
 		ReturnNew: true,
 	}
-	_, err := counterCollection.Find(bson.M{"_id": "isaacsucks"}).Apply(change, &counter)
+	_, err := DB.C("counter").Find(bson.M{"_id": "isaacsucks"}).Apply(change, &counter)
 
 	if err != nil {
 		panic(err)
@@ -28,7 +28,7 @@ func UpdateCharacter(request UpdateRequest) Character {
 	char := bson.M{"_id": request.ID}
 	if request.Gold != 0 {
 		change := bson.M{"$set": bson.M{"gold": request.Gold}}
-		err := characterCollection.Update(char, change)
+		err := DB.C("characters").Update(char, change)
 
 		if err != nil {
 			panic(err)
@@ -38,7 +38,7 @@ func UpdateCharacter(request UpdateRequest) Character {
 
 	if request.ProID != "" {
 		change := bson.M{"$set": bson.M{"pro_id": HashString(request.ProID)}}
-		err := characterCollection.Update(char, change)
+		err := DB.C("characters").Update(char, change)
 
 		if err != nil {
 			panic(err)
@@ -48,7 +48,7 @@ func UpdateCharacter(request UpdateRequest) Character {
 
 	if request.Experience != 0 {
 		change := bson.M{"$set": bson.M{"experience": request.Experience}}
-		err := characterCollection.Update(char, change)
+		err := DB.C("characters").Update(char, change)
 
 		if err != nil {
 			panic(err)
@@ -67,9 +67,9 @@ func UpdateCharacter(request UpdateRequest) Character {
 func PlayerNumForID(id string) (int, error) {
 
 	result := Character{}
-	err := characterCollection.Find(bson.M{"_id": id}).One(&result)
+	err := DB.C("characters").Find(bson.M{"_id": id}).One(&result)
 	if err != nil {
-		err = characterCollection.Find(bson.M{"pro_id": id}).One(&result)
+		err = DB.C("characters").Find(bson.M{"pro_id": id}).One(&result)
 		if err != nil {
 			return 0, err
 		}
@@ -83,7 +83,7 @@ func PlayerNumForID(id string) (int, error) {
 // generate the hash for the _id.
 func CreateNewCharacter(data string) Character {
 	char := Character{ID: HashString(data), PlayerNum: GetNextCharacterNum()}
-	err := characterCollection.Insert(&char)
+	err := DB.C("characters").Insert(&char)
 
 	if err != nil {
 		panic(err)
@@ -98,7 +98,7 @@ func CreateNewCharacter(data string) Character {
 func FindCharacter(identifier string) (Character, error) {
 
 	result := Character{}
-	err := characterCollection.Find(bson.M{"_id": identifier}).One(&result)
+	err := DB.C("characters").Find(bson.M{"_id": identifier}).One(&result)
 	if err != nil {
 		i, err := strconv.Atoi(identifier)
 
@@ -106,7 +106,7 @@ func FindCharacter(identifier string) (Character, error) {
 			return result, err
 		}
 
-		err = characterCollection.Find(bson.M{"num": i}).One(&result)
+		err = DB.C("characters").Find(bson.M{"num": i}).One(&result)
 		if err != nil {
 			return result, err
 		}
