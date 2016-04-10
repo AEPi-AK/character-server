@@ -1,10 +1,9 @@
 package main
 
 import (
-	"encoding/hex"
 	"crypto/sha256"
+	"encoding/hex"
 )
-
 
 func HashString(str string) string {
 	hash := sha256.New()

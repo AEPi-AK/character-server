@@ -2,6 +2,7 @@ package main
 
 import (
 	"strconv"
+
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -9,7 +10,7 @@ import (
 // Gets the next auto-incremented player num.
 func GetNextCharacterNum() int {
 	change := mgo.Change{
-		Update: bson.M{"$inc": bson.M{"count": 1}},
+		Update:    bson.M{"$inc": bson.M{"count": 1}},
 		ReturnNew: true,
 	}
 	_, err := counterCollection.Find(bson.M{"_id": "isaacsucks"}).Apply(change, &counter)
@@ -18,7 +19,7 @@ func GetNextCharacterNum() int {
 		panic(err)
 	}
 
-	return counter.Seq;
+	return counter.Seq
 }
 
 // Updates a character given some update request
@@ -26,7 +27,7 @@ func UpdateCharacter(request UpdateRequest) Character {
 
 	char := bson.M{"_id": request.ID}
 	if request.Gold != 0 {
-		change := bson.M{"$set": bson.M{ "gold": request.Gold}}
+		change := bson.M{"$set": bson.M{"gold": request.Gold}}
 		err := characterCollection.Update(char, change)
 
 		if err != nil {
@@ -36,7 +37,7 @@ func UpdateCharacter(request UpdateRequest) Character {
 	}
 
 	if request.ProID != "" {
-		change := bson.M{"$set": bson.M{ "pro_id": HashString(request.ProID)}}
+		change := bson.M{"$set": bson.M{"pro_id": HashString(request.ProID)}}
 		err := characterCollection.Update(char, change)
 
 		if err != nil {
@@ -46,7 +47,7 @@ func UpdateCharacter(request UpdateRequest) Character {
 	}
 
 	if request.Experience != 0 {
-		change := bson.M{"$set": bson.M{ "experience": request.Experience}}
+		change := bson.M{"$set": bson.M{"experience": request.Experience}}
 		err := characterCollection.Update(char, change)
 
 		if err != nil {
@@ -54,7 +55,6 @@ func UpdateCharacter(request UpdateRequest) Character {
 
 		}
 	}
-
 
 	character, _ := FindCharacter(request.ID)
 

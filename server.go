@@ -1,17 +1,18 @@
 package main
 
-import ( 
+import (
 	"log"
 
 	"net/http"
+
 	"gopkg.in/mgo.v2"
 )
 
 var (
-	clean = false
+	clean               = false
 	characterCollection *mgo.Collection
-	counterCollection *mgo.Collection
-	counter Counter
+	counterCollection   *mgo.Collection
+	counter             Counter
 )
 
 func main() {
@@ -38,14 +39,13 @@ func main() {
 	counterCollection = session.DB("aepi-ak-booth-2016").C("counter")
 
 	// Initialize Counter if starting a clean DB
-	if clean { 
+	if clean {
 		err = counterCollection.Insert(&Counter{ID: "isaacsucks", Seq: 0})
 	}
 
 	if err != nil {
 		panic(err)
 	}
-
 
 	router := NewRouter()
 

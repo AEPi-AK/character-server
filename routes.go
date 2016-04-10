@@ -17,7 +17,6 @@ var routes = Routes{
 		"POST",
 		"/characters",
 		CharacterCreate,
-
 	},
 	Route{
 		"CharacterUpdate",
