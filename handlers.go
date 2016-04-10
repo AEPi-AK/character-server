@@ -10,6 +10,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// Handler for character creation
+// ENDPOINT: /characters
 func CharacterCreate(w http.ResponseWriter, r *http.Request) {
     var requestData CreateRequest 
     body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
@@ -35,7 +37,8 @@ func CharacterCreate(w http.ResponseWriter, r *http.Request) {
     }
 }
 
-
+// Handler for character updating 
+// ENDPOINT: /characters/update
 func CharacterUpdate(w http.ResponseWriter, r *http.Request) {
     var requestData UpdateRequest 
     body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
@@ -61,6 +64,8 @@ func CharacterUpdate(w http.ResponseWriter, r *http.Request) {
     }
 }
 
+// Handler for getting a character 
+// ENDPOINT: /character/{identifier}
 func CharacterShow(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)

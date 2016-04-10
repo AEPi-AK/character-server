@@ -1,5 +1,6 @@
 package main
 
+// Represents a character.
 type Character struct {
 	ID string `bson:"_id" json:"_id"`
 	ProID string `bson:"pro_id" json:"pro_id"`

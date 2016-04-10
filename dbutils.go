@@ -23,16 +23,38 @@ func GetNextCharacterNum() int {
 
 // Updates a character given some update request
 func UpdateCharacter(request UpdateRequest) Character {
-	change := bson.M{"gold": request.Gold, "pro_id": request.ProID, "experience": request.Experience}
 
 	char := bson.M{"_id": request.ID}
+	if request.Gold != 0 {
+		change := bson.M{"$set": bson.M{ "gold": request.Gold}}
+		err := characterCollection.Update(char, change)
 
-	err := characterCollection.Update(char, change)
+		if err != nil {
+			panic(err)
 
-	if err != nil {
-		panic(err)
-
+		}
 	}
+
+	if request.ProID != "" {
+		change := bson.M{"$set": bson.M{ "pro_id": HashString(request.ProID)}}
+		err := characterCollection.Update(char, change)
+
+		if err != nil {
+			panic(err)
+
+		}
+	}
+
+	if request.Experience != 0 {
+		change := bson.M{"$set": bson.M{ "experience": request.Experience}}
+		err := characterCollection.Update(char, change)
+
+		if err != nil {
+			panic(err)
+
+		}
+	}
+
 
 	character, _ := FindCharacter(request.ID)
 
