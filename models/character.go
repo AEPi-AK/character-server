@@ -1,4 +1,4 @@
-package main
+package models
 
 // Represents a character.
 type Character struct {
