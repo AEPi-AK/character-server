@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/AEPi-AK/character-server/models"
 	log "github.com/Sirupsen/logrus"
@@ -46,6 +47,13 @@ func main() {
 		panic(err)
 	}
 
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		port = "8000"
+	}
+
 	handler := cors.Default().Handler(NewRouter())
-	log.Fatal(http.ListenAndServe(":8000", handler))
+	log.Info("Listening on port ", port)
+	log.Fatal(http.ListenAndServe(":"+port, handler))
 }
