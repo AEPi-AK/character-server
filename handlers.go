@@ -12,21 +12,22 @@ import (
 
 // Represents a character creation request.
 type CreateRequest struct {
-	Data string `bson:"data" json:"data"`
+	Data string `json:"data"`
 }
 
 type UpdateRequest struct {
-	ID         string `bson:"_id" json:"_id"`
-	ProID      string `bson:"pro_id" json:"pro_id"`
-	Experience int    `bson:"experience" json:"experience"`
-	Gold       int    `bson:"gold" json:"gold"`
+	ID         string `json:"_id"`
+	ProID      string `json:"pro_id"`
+	Experience int    `json:"experience"`
+	Gold       int    `json:"gold"`
 }
 
 // Handler for character creation
-// ENDPOINT: /characters
+// ENDPOINT: /characters/create
 func CharacterCreate(w http.ResponseWriter, r *http.Request) {
 	var requestData CreateRequest
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+
 	if err != nil {
 		panic(err)
 	}
@@ -86,7 +87,7 @@ func CharacterShow(w http.ResponseWriter, r *http.Request) {
 	result, err := FindCharacter(identifier)
 
 	if err != nil {
-		fmt.Fprintln(w, "Character not found!")
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 

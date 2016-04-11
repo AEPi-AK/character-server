@@ -11,10 +11,13 @@ import (
 
 // Gets the next auto-incremented player num.
 func GetNextCharacterNum() int {
+	var counter models.Counter
+
 	change := mgo.Change{
 		Update:    bson.M{"$inc": bson.M{"count": 1}},
 		ReturnNew: true,
 	}
+
 	_, err := DB.C("counter").Find(bson.M{"_id": "isaacsucks"}).Apply(change, &counter)
 
 	if err != nil {
