@@ -5,6 +5,7 @@ import (
 
 	"github.com/AEPi-AK/character-server/models"
 	log "github.com/Sirupsen/logrus"
+	"github.com/rs/cors"
 	"gopkg.in/mgo.v2"
 )
 
@@ -45,5 +46,6 @@ func main() {
 		panic(err)
 	}
 
-	log.Fatal(http.ListenAndServe(":8000", NewRouter()))
+	handler := cors.Default().Handler(NewRouter())
+	log.Fatal(http.ListenAndServe(":8000", handler))
 }
