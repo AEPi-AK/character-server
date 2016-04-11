@@ -26,48 +26,35 @@ func GetNextCharacterNum() int {
 
 // Updates a character given some update request
 func UpdateCharacter(request UpdateRequest) models.Character {
+	character, err := FindCharacter(request.ID)
 
-	char := bson.M{"_id": request.ID}
+	if err != nil {
+		panic(err)
+	}
+
 	if request.Gold != 0 {
-		change := bson.M{"$set": bson.M{"gold": request.Gold}}
-		err := DB.C("characters").Update(char, change)
-
-		if err != nil {
-			panic(err)
-
-		}
+		character.Gold = request.Gold
 	}
 
 	if request.ProID != "" {
-		change := bson.M{"$set": bson.M{"pro_id": HashString(request.ProID)}}
-		err := DB.C("characters").Update(char, change)
-
-		if err != nil {
-			panic(err)
-
-		}
+		character.ProID = HashString(request.ProID)
 	}
 
 	if request.Experience != 0 {
-		change := bson.M{"$set": bson.M{"experience": request.Experience}}
-		err := DB.C("characters").Update(char, change)
-
-		if err != nil {
-			panic(err)
-
-		}
+		character.Experience = request.Experience
 	}
 
-	character, _ := FindCharacter(request.ID)
+	err = DB.C("characters").Update(bson.M{"_id": character.ID}, character)
+	if err != nil {
+		panic(err)
+	}
 
 	return character
-
 }
 
 // Returns the player number given some id (pro or regular). If the id is not
 // in the DB, we return an error.
 func PlayerNumForID(id string) (int, error) {
-
 	result := models.Character{}
 	err := DB.C("characters").Find(bson.M{"_id": id}).One(&result)
 	if err != nil {
@@ -78,7 +65,6 @@ func PlayerNumForID(id string) (int, error) {
 	}
 
 	return result.PlayerNum, nil
-
 }
 
 // Creates a new character given some string of data. The data is used to
@@ -98,20 +84,22 @@ func CreateNewCharacter(data string) models.Character {
 // be the _id, pro_id, or num of the character. If none exists, an error
 // is returned.
 func FindCharacter(identifier string) (models.Character, error) {
+	var result models.Character
 
-	result := models.Character{}
-	err := DB.C("characters").Find(bson.M{"_id": identifier}).One(&result)
-	if err != nil {
-		i, err := strconv.Atoi(identifier)
+	i, err := strconv.Atoi(identifier)
 
-		if err != nil {
-			return result, err
-		}
-
+	// If identifier is an integer, find character with that player number
+	if err == nil {
 		err = DB.C("characters").Find(bson.M{"num": i}).One(&result)
+	} else {
+		err = DB.C("characters").Find(bson.M{"_id": identifier}).One(&result)
 		if err != nil {
-			return result, err
+			err = DB.C("characters").Find(bson.M{"pro_id": identifier}).One(&result)
 		}
+	}
+
+	if err != nil {
+		panic(err)
 	}
 
 	return result, nil
