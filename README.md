@@ -1,4 +1,4 @@
-# booth-2016-character-server
+#character-server
 
 ## Data
 Character (JSON):
