@@ -1,4 +1,4 @@
-package main
+package models
 
 // For auto-incrementing player numbers.
 type Counter struct {

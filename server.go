@@ -1,17 +1,15 @@
 package main
 
 import (
-	"log"
-
 	"net/http"
 
+	"github.com/AEPi-AK/character-server/models"
+	log "github.com/Sirupsen/logrus"
 	"gopkg.in/mgo.v2"
 )
 
 var (
-	clean   = false
-	DB      *mgo.Database
-	counter Counter
+	DB *mgo.Database
 )
 
 func main() {
@@ -27,14 +25,17 @@ func main() {
 	session.SetMode(mgo.Monotonic, true)
 	DB = session.DB("aepi-ak-booth-2016")
 
-	// If clean is true, drop the database and reset the auto-incrementing sequence
-	if clean {
+	// If characters collection empty or non-existent, drop the database
+	// and reset the auto-incrementing sequence collection.
+	count, err := DB.C("characters").Count()
+	if err != nil || count == 0 {
+		log.Warn("character collection empty or nonexistent, resetting database")
 		err = DB.DropDatabase()
 		if err != nil {
 			panic(err)
 		}
 
-		err = DB.C("counter").Insert(&Counter{ID: "isaacsucks", Seq: 0})
+		err = DB.C("counter").Insert(&models.Counter{ID: "isaacsucks", Seq: 0})
 		if err != nil {
 			panic(err)
 		}
