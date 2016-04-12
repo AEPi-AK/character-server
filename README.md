@@ -13,7 +13,7 @@ GET /characters/{identifier}
 Gets the character for a given identifier. The identifier can e the id, pro_id, or player num.
 
 POST /characters/create
-Creates a new character. We expect JSON of the form {"data": string_from_card_reader}
+Creates a new character. We expect JSON of the form {"data": string_from_card_reader, "race": some_race_string, "strength": int, "wisdom": int, "dexterity": int}
 
 POST /characters/update
 Updates an existing character. We expect JSON of the form {"_id": unique_hash, "pro_id": data_from_card_reader, "gold": int, "experience": int}
