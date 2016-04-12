@@ -6,5 +6,8 @@ type Character struct {
 	ProID      string `bson:"pro_id" json:"pro_id"`
 	PlayerNum  int    `bson:"num" json:"num"`
 	Experience int    `bson:"experience" json:"experience"`
-	Gold       int    `bson:"gold" json:"gold"`
+	Race string `bson:"race" json:"race"`
+	Strength int `bson:"strength" json:"strength"`
+	Dexterity int `bson:"dexterity" json:"dexterity"`
+	Wisdom int `bson:"wisdom" json:"wisdom"`
 }

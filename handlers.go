@@ -13,6 +13,10 @@ import (
 // Represents a character creation request.
 type CreateRequest struct {
 	Data string `json:"data"`
+	Race string `json:"race"`
+	Strength int `json:"strength"`
+	Dexterity int `json:"dexterity"`
+	Wisdom int `json:"wisdom"`
 }
 
 type UpdateRequest struct {
@@ -48,7 +52,7 @@ func CharacterCreate(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	character, err := CreateNewCharacter(requestData.Data)
+	character, err := CreateNewCharacter(requestData)
 	
 	if err != nil {
 		RespondBadRequest(w, err)

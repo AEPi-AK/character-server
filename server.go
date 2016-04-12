@@ -16,7 +16,7 @@ var (
 
 func main() {
 
-	session, err := mgo.Dial("mongodb://isaac:sucks@ds021650.mlab.com:21650/aepi-ak-booth-2016")
+	session, err := mgo.Dial("mongodb://isaac:sucks@ds023480.mlab.com:23480/character-server")
 
 	if err != nil {
 		panic(err)
@@ -25,7 +25,7 @@ func main() {
 	defer session.Close()
 
 	session.SetMode(mgo.Monotonic, true)
-	DB = session.DB("aepi-ak-booth-2016")
+	DB = session.DB("character-server")
 
 	// If characters collection empty or non-existent, drop the database
 	// and reset the auto-incrementing sequence collection.
