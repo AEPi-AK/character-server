@@ -22,6 +22,10 @@ type UpdateRequest struct {
 	Gold       int    `json:"gold"`
 }
 
+func RespondBadRequest(w http.ResponseWriter, err error) {
+	http.Error(w, err.Error(), http.StatusBadRequest)
+}
+
 // Handler for character creation
 // ENDPOINT: /characters/create
 func CharacterCreate(w http.ResponseWriter, r *http.Request) {
@@ -29,10 +33,12 @@ func CharacterCreate(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 
 	if err != nil {
-		panic(err)
+		RespondBadRequest(w, err)
+		return
 	}
 	if err := r.Body.Close(); err != nil {
-		panic(err)
+		RespondBadRequest(w, err)
+		return
 	}
 	if err := json.Unmarshal(body, &requestData); err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -42,11 +48,18 @@ func CharacterCreate(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	character := CreateNewCharacter(requestData.Data)
+	character, err := CreateNewCharacter(requestData.Data)
+	
+	if err != nil {
+		RespondBadRequest(w, err)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(character); err != nil {
-		panic(err)
+		RespondBadRequest(w, err)
+		return
 	}
 }
 
@@ -56,10 +69,12 @@ func CharacterUpdate(w http.ResponseWriter, r *http.Request) {
 	var requestData UpdateRequest
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
-		panic(err)
+		RespondBadRequest(w, err)
+		return
 	}
 	if err := r.Body.Close(); err != nil {
-		panic(err)
+		RespondBadRequest(w, err)
+		return
 	}
 	if err := json.Unmarshal(body, &requestData); err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -69,11 +84,17 @@ func CharacterUpdate(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	character := UpdateCharacter(requestData)
+	character, err := UpdateCharacter(requestData)
+
+	if err != nil {
+		RespondBadRequest(w, err)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(character); err != nil {
-		panic(err)
+		RespondBadRequest(w, err)
+		return
 	}
 }
 

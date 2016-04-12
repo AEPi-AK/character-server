@@ -28,11 +28,11 @@ func GetNextCharacterNum() int {
 }
 
 // Updates a character given some update request
-func UpdateCharacter(request UpdateRequest) models.Character {
+func UpdateCharacter(request UpdateRequest) (models.Character, error) {
 	character, err := FindCharacter(request.ID)
 
 	if err != nil {
-		panic(err)
+		return character, err
 	}
 
 	if request.Gold != 0 {
@@ -49,10 +49,10 @@ func UpdateCharacter(request UpdateRequest) models.Character {
 
 	err = DB.C("characters").Update(bson.M{"_id": character.ID}, character)
 	if err != nil {
-		panic(err)
+		return character, err
 	}
 
-	return character
+	return character, nil
 }
 
 // Returns the player number given some id (pro or regular). If the id is not
@@ -72,15 +72,15 @@ func PlayerNumForID(id string) (int, error) {
 
 // Creates a new character given some string of data. The data is used to
 // generate the hash for the _id.
-func CreateNewCharacter(data string) models.Character {
+func CreateNewCharacter(data string) (models.Character, error) {
 	char := models.Character{ID: HashString(data), PlayerNum: GetNextCharacterNum()}
 	err := DB.C("characters").Insert(&char)
 
 	if err != nil {
-		panic(err)
+		return char, err
 	}
 
-	return char
+	return char, nil
 }
 
 // Finds a character given some identifier string. This string can either
@@ -102,7 +102,7 @@ func FindCharacter(identifier string) (models.Character, error) {
 	}
 
 	if err != nil {
-		panic(err)
+		return result, err
 	}
 
 	return result, nil
