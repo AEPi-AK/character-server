@@ -26,6 +26,7 @@ type UpdateRequest struct {
 	ProID      string `json:"pro_id"`
 	Experience int    `json:"experience"`
 	Gold       int    `json:"gold"`
+	Name string `json:"name"`
 }
 
 type ErrorResponse struct {

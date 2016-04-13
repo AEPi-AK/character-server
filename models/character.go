@@ -13,4 +13,5 @@ type Character struct {
 	Dexterity int `bson:"dexterity" json:"dexterity"`
 	Wisdom int `bson:"wisdom" json:"wisdom"`
 	CreatedAt time.Time `bson:"created_at" json:"created_at"` 
+	Name string `bson:"name" json:"name"`
 }

@@ -43,6 +43,10 @@ func UpdateCharacter(request UpdateRequest) (models.Character, error) {
 		character.Experience = request.Experience
 	}
 
+	if request.Name != "" {
+		character.Name = request.Name
+	}
+
 	err = DB.C("characters").Update(bson.M{"_id": character.ID}, character)
 	if err != nil {
 		return character, err
