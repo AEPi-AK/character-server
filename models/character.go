@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 // Represents a character.
 type Character struct {
 	ID         string `bson:"_id" json:"id"`
@@ -10,4 +12,5 @@ type Character struct {
 	Strength int `bson:"strength" json:"strength"`
 	Dexterity int `bson:"dexterity" json:"dexterity"`
 	Wisdom int `bson:"wisdom" json:"wisdom"`
+	CreatedAt time.Time `bson:"created_at" json:"created_at"` 
 }

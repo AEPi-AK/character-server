@@ -2,7 +2,7 @@ package main
 
 import (
 	"strconv"
-
+	"time"
 	"github.com/AEPi-AK/character-server/models"
 
 	"gopkg.in/mgo.v2"
@@ -69,7 +69,7 @@ func PlayerNumForID(id string) (int, error) {
 // Creates a new character given some string of data. The data is used to
 // generate the hash for the _id.
 func CreateNewCharacter(requestData CreateRequest) (models.Character, error) {
-	char := models.Character{ID: HashString(requestData.Data), PlayerNum: GetNextCharacterNum(), Race: requestData.Race, Strength: requestData.Strength, Dexterity: requestData.Dexterity, Wisdom: requestData.Wisdom}
+	char := models.Character{ID: HashString(requestData.Data), PlayerNum: GetNextCharacterNum(), Race: requestData.Race, Strength: requestData.Strength, Dexterity: requestData.Dexterity, Wisdom: requestData.Wisdom, CreatedAt: time.Now()}
 	err := DB.C("characters").Insert(&char)
 
 	if err != nil {
