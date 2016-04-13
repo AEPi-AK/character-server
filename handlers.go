@@ -2,11 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"time"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
@@ -14,11 +14,11 @@ import (
 
 // Represents a character creation request.
 type CreateRequest struct {
-	Data string `json:"data"`
-	Race string `json:"race"`
-	Strength int `json:"strength"`
-	Dexterity int `json:"dexterity"`
-	Wisdom int `json:"wisdom"`
+	ID        string `json:"id"`
+	Race      string `json:"race"`
+	Strength  int    `json:"strength"`
+	Dexterity int    `json:"dexterity"`
+	Wisdom    int    `json:"wisdom"`
 }
 
 type UpdateRequest struct {
@@ -26,18 +26,18 @@ type UpdateRequest struct {
 	ProID      string `json:"pro_id"`
 	Experience int    `json:"points"`
 	Gold       int    `json:"gold"`
-	Name string `json:"name"`
+	Name       string `json:"name"`
 }
 
 type ErrorResponse struct {
-	Error	string `json:"error"`
+	Error string `json:"error"`
 }
 
 // Given a message, responds with a JSON object containing that message 
 // as an error string/
 func RespondBadRequest(w http.ResponseWriter, message string) {
 	log.WithFields(log.Fields{
-		"time": time.Now(),
+		"time":    time.Now(),
 		"message": message,
 	}).Error("Received a bad request")
 	errorResponse := ErrorResponse{Error: message}
@@ -76,16 +76,19 @@ func CharacterCreate(w http.ResponseWriter, r *http.Request) {
 	var requestData CreateRequest
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
 	if err != nil {
 		RespondBadRequest(w, err.Error())
 		return
 	}
+
 	if err := r.Body.Close(); err != nil {
 		RespondBadRequest(w, err.Error())
 		return
 	}
+
 	if err := json.Unmarshal(body, &requestData); err != nil {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(422) // unprocessable entity
 		if err := json.NewEncoder(w).Encode(err); err != nil {
 			panic(err)
@@ -93,18 +96,18 @@ func CharacterCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	character, err := CreateNewCharacter(requestData)
-	
+
 	if err != nil {
 		RespondBadRequest(w, err.Error())
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(character); err != nil {
 		RespondBadRequest(w, err.Error())
 		return
 	}
+
+	w.WriteHeader(http.StatusCreated)
 }
 
 // Handler for character updating
@@ -121,7 +124,6 @@ func CharacterUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := json.Unmarshal(body, &requestData); err != nil {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(422) // unprocessable entity
 		if err := json.NewEncoder(w).Encode(err); err != nil {
 			RespondBadRequest(w, "Bad character update request")
@@ -136,15 +138,16 @@ func CharacterUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	log.WithFields(log.Fields{
 		"time": time.Now(),
-		"id" : character.ID,
+		"id":   character.ID,
 	}).Info("Received character update request")
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(character); err != nil {
 		RespondBadRequest(w, err.Error())
 		return
 	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 // Handler for getting a character
@@ -155,7 +158,7 @@ func CharacterShow(w http.ResponseWriter, r *http.Request) {
 
 	log.WithFields(log.Fields{
 		"time": time.Now(),
-		"id" : identifier,
+		"id":   identifier,
 	}).Info("Received character display request")
 
 	result, err := FindCharacter(identifier)
@@ -163,9 +166,9 @@ func CharacterShow(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"time": time.Now(),
-			"id" : identifier,
-		}).Error("Error finding character")
-		
+			"id":   identifier,
+		}).Warn("Character not found")
+
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
