@@ -143,7 +143,7 @@ func CharacterShow(w http.ResponseWriter, r *http.Request) {
 		log.WithFields(log.Fields{
 			"time": time.Now(),
 			"id":   identifier,
-		}).Error("Error finding character")
+		}).Warn("Character not found")
 
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
