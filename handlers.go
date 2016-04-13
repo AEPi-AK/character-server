@@ -58,7 +58,7 @@ func CharactersByPoints(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 	if err = json.NewEncoder(w).Encode(characters); err != nil {
 		RespondBadRequest(w, err.Error())
 		return
@@ -90,13 +90,13 @@ func CharacterCreate(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.Unmarshal(body, &requestData); err != nil {
 		w.WriteHeader(422) // unprocessable entity
-		fmt.Println("HERE!")
 		if err := json.NewEncoder(w).Encode(err); err != nil {
 			panic(err)
 		}
 	}
 
 	character, err := CreateNewCharacter(requestData)
+	fmt.Println(requestData.ID)
 
 	if err != nil {
 		RespondBadRequest(w, err.Error())
