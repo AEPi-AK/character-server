@@ -39,7 +39,7 @@ func NewRouter() *mux.Router {
 		Route{
 			"CharactersByPoints",
 			"GET",
-			"/characters-leaderboard",
+			"/character-leaderboards",
 			CharactersByPoints,
 		},
 	}
