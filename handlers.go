@@ -90,6 +90,7 @@ func CharacterCreate(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.Unmarshal(body, &requestData); err != nil {
 		w.WriteHeader(422) // unprocessable entity
+		fmt.Println("HERE!")
 		if err := json.NewEncoder(w).Encode(err); err != nil {
 			panic(err)
 		}
@@ -102,12 +103,12 @@ func CharacterCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(character); err != nil {
 		RespondBadRequest(w, err.Error())
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
 }
 
 // Handler for character updating

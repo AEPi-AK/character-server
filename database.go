@@ -58,7 +58,7 @@ func UpdateCharacter(request UpdateRequest) (models.Character, error) {
 
 func CharactersInPointOrder() ([]models.Character, error){
 	var results []models.Character
-	err := DB.C("characters").Find(nil).Sort("points").All(&results)
+	err := DB.C("characters").Find(nil).Sort("-points").All(&results)
 	if err != nil {
 		return results, err
 	}
