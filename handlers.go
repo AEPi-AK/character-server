@@ -2,11 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"time"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
 )
 
@@ -20,28 +22,42 @@ type CreateRequest struct {
 }
 
 type UpdateRequest struct {
-	ID         string `json:"_id"`
+	ID         string `json:"id"`
 	ProID      string `json:"pro_id"`
 	Experience int    `json:"experience"`
 	Gold       int    `json:"gold"`
 }
 
-func RespondBadRequest(w http.ResponseWriter, err error) {
-	http.Error(w, err.Error(), http.StatusBadRequest)
+type ErrorResponse struct {
+	Error	string `json:"error"`
+}
+
+func RespondBadRequest(w http.ResponseWriter, message string) {
+	log.WithFields(log.Fields{
+		"time": time.Now(),
+		"message": message,
+	}).Error("Received a bad request")
+	errorResponse := ErrorResponse{Error: message}
+	http.Error(w, "", http.StatusBadRequest)
+	_ = json.NewEncoder(w).Encode(errorResponse)
 }
 
 // Handler for character creation
 // ENDPOINT: /characters/create
 func CharacterCreate(w http.ResponseWriter, r *http.Request) {
+	log.WithFields(log.Fields{
+		"time": time.Now(),
+	}).Info("Received character create request")
+
 	var requestData CreateRequest
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 
 	if err != nil {
-		RespondBadRequest(w, err)
+		RespondBadRequest(w, err.Error())
 		return
 	}
 	if err := r.Body.Close(); err != nil {
-		RespondBadRequest(w, err)
+		RespondBadRequest(w, err.Error())
 		return
 	}
 	if err := json.Unmarshal(body, &requestData); err != nil {
@@ -55,14 +71,14 @@ func CharacterCreate(w http.ResponseWriter, r *http.Request) {
 	character, err := CreateNewCharacter(requestData)
 	
 	if err != nil {
-		RespondBadRequest(w, err)
+		RespondBadRequest(w, err.Error())
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(character); err != nil {
-		RespondBadRequest(w, err)
+		RespondBadRequest(w, err.Error())
 		return
 	}
 }
@@ -73,31 +89,35 @@ func CharacterUpdate(w http.ResponseWriter, r *http.Request) {
 	var requestData UpdateRequest
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
-		RespondBadRequest(w, err)
+		RespondBadRequest(w, err.Error())
 		return
 	}
 	if err := r.Body.Close(); err != nil {
-		RespondBadRequest(w, err)
+		RespondBadRequest(w, err.Error())
 		return
 	}
 	if err := json.Unmarshal(body, &requestData); err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(422) // unprocessable entity
 		if err := json.NewEncoder(w).Encode(err); err != nil {
-			panic(err)
+			RespondBadRequest(w, "Bad character update request")
 		}
 	}
 
 	character, err := UpdateCharacter(requestData)
-
 	if err != nil {
-		RespondBadRequest(w, err)
+		RespondBadRequest(w, "Error updating character")
 		return
 	}
+	log.WithFields(log.Fields{
+		"time": time.Now(),
+		"id" : character.ID,
+	}).Info("Received character update request")
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(character); err != nil {
-		RespondBadRequest(w, err)
+		RespondBadRequest(w, err.Error())
 		return
 	}
 }
@@ -105,13 +125,22 @@ func CharacterUpdate(w http.ResponseWriter, r *http.Request) {
 // Handler for getting a character
 // ENDPOINT: /character/{identifier}
 func CharacterShow(w http.ResponseWriter, r *http.Request) {
-
 	vars := mux.Vars(r)
 	identifier := vars["identifier"]
+
+	log.WithFields(log.Fields{
+		"time": time.Now(),
+		"id" : identifier,
+	}).Info("Received character display request")
 
 	result, err := FindCharacter(identifier)
 
 	if err != nil {
+		log.WithFields(log.Fields{
+			"time": time.Now(),
+			"id" : identifier,
+		}).Error("Error finding character")
+		
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
