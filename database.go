@@ -36,7 +36,7 @@ func UpdateCharacter(request UpdateRequest) (models.Character, error) {
 	}
 
 	if request.ProID != "" {
-		character.ProID = HashString(request.ProID)
+		character.ProID = request.ProID
 	}
 
 	if request.Experience != 0 {
@@ -71,9 +71,9 @@ func PlayerNumForID(id string) (int, error) {
 }
 
 // Creates a new character given some string of data. The data is used to
-// generate the hash for the _id.
+// generate the for the _id.
 func CreateNewCharacter(requestData CreateRequest) (models.Character, error) {
-	char := models.Character{ID: HashString(requestData.Data), PlayerNum: GetNextCharacterNum(), Race: requestData.Race, Strength: requestData.Strength, Dexterity: requestData.Dexterity, Wisdom: requestData.Wisdom, CreatedAt: time.Now()}
+	char := models.Character{ID: requestData.Data, PlayerNum: GetNextCharacterNum(), Race: requestData.Race, Strength: requestData.Strength, Dexterity: requestData.Dexterity, Wisdom: requestData.Wisdom, CreatedAt: time.Now()}
 	err := DB.C("characters").Insert(&char)
 
 	if err != nil {
