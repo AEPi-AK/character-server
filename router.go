@@ -36,6 +36,12 @@ func NewRouter() *mux.Router {
 			"/characters/{identifier}",
 			CharacterShow,
 		},
+		Route{
+			"CharactersByPoints",
+			"GET",
+			"/characters-leaderboard",
+			CharactersByPoints,
+		},
 	}
 
 	router := mux.NewRouter().StrictSlash(true)

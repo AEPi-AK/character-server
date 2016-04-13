@@ -24,7 +24,7 @@ type CreateRequest struct {
 type UpdateRequest struct {
 	ID         string `json:"id"`
 	ProID      string `json:"pro_id"`
-	Experience int    `json:"experience"`
+	Experience int    `json:"points"`
 	Gold       int    `json:"gold"`
 	Name string `json:"name"`
 }
@@ -33,6 +33,8 @@ type ErrorResponse struct {
 	Error	string `json:"error"`
 }
 
+// Given a message, responds with a JSON object containing that message 
+// as an error string/
 func RespondBadRequest(w http.ResponseWriter, message string) {
 	log.WithFields(log.Fields{
 		"time": time.Now(),
@@ -41,6 +43,27 @@ func RespondBadRequest(w http.ResponseWriter, message string) {
 	errorResponse := ErrorResponse{Error: message}
 	http.Error(w, "", http.StatusBadRequest)
 	_ = json.NewEncoder(w).Encode(errorResponse)
+}
+
+func CharactersByPoints(w http.ResponseWriter, r *http.Request) {
+	log.WithFields(log.Fields{
+		"time": time.Now(),
+	}).Info("Received characters sorted by points request")
+
+	characters, err := CharactersInPointOrder()
+
+	if err != nil {
+		RespondBadRequest(w, "unable to query characters by points")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusCreated)
+	if err = json.NewEncoder(w).Encode(characters); err != nil {
+		RespondBadRequest(w, err.Error())
+		return
+	}
+
 }
 
 // Handler for character creation
@@ -102,6 +125,7 @@ func CharacterUpdate(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(422) // unprocessable entity
 		if err := json.NewEncoder(w).Encode(err); err != nil {
 			RespondBadRequest(w, "Bad character update request")
+			return
 		}
 	}
 

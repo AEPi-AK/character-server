@@ -55,6 +55,16 @@ func UpdateCharacter(request UpdateRequest) (models.Character, error) {
 	return character, nil
 }
 
+func CharactersInPointOrder() ([]models.Character, error){
+	var results []models.Character
+	err := DB.C("characters").Find(nil).Sort("points").All(&results)
+	if err != nil {
+		return results, err
+	}
+
+	return results, err
+}
+
 // Returns the player number given some id (pro or regular). If the id is not
 // in the DB, we return an error.
 func PlayerNumForID(id string) (int, error) {
