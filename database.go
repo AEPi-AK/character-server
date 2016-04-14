@@ -84,9 +84,12 @@ func PlayerNumForID(id string) (int, error) {
 // Creates a new character given some string of data. The data is used to
 // generate the for the _id.
 func CreateNewCharacter(requestData CreateRequest) (models.Character, error) {
+	num := GetNextCharacterNum()
+	num_string := strconv.Itoa(num)
 	char := models.Character{
 		ID:        requestData.ID,
-		PlayerNum: GetNextCharacterNum(),
+		Name:	   "Player " + num_string,	
+		PlayerNum: num,
 		Race:      requestData.Race,
 		Strength:  requestData.Strength,
 		Dexterity: requestData.Dexterity,
