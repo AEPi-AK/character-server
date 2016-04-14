@@ -2,7 +2,6 @@ package main
 
 import (
 	"strconv"
-	"fmt"
 	"time"
 
 	"github.com/AEPi-AK/character-server/models"
