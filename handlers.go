@@ -142,13 +142,13 @@ func CharacterUpdate(w http.ResponseWriter, r *http.Request) {
 		"id":   character.ID,
 	}).Info("Received character update request")
 
+	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	if err := json.NewEncoder(w).Encode(character); err != nil {
 		RespondBadRequest(w, err.Error())
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
 }
 
 // Handler for getting a character
