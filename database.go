@@ -112,7 +112,7 @@ func FindCharacter(identifier string) (models.Character, error) {
 
 	// If identifier is an integer, find character with that player number
 	if err == nil {
-		err = DB.C("characters").Find(bson.M{"num": i}).One(&result)
+		err = DB.C("characters").Find(bson.M{"number": i}).One(&result)
 	} else {
 		err = DB.C("characters").Find(bson.M{"_id": identifier}).One(&result)
 		if err != nil {
