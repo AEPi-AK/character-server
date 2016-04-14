@@ -2,6 +2,7 @@ package main
 
 import (
 	"strconv"
+	"fmt"
 	"time"
 
 	"github.com/AEPi-AK/character-server/models"
@@ -111,15 +112,19 @@ func CreateNewCharacter(requestData CreateRequest) (models.Character, error) {
 func FindCharacter(identifier string) (models.Character, error) {
 	var result models.Character
 
-	i, err := strconv.Atoi(identifier)
 
 	// If identifier is an integer, find character with that player number
-	if err == nil {
-		err = DB.C("characters").Find(bson.M{"number": i}).One(&result)
-	} else {
-		err = DB.C("characters").Find(bson.M{"_id": identifier}).One(&result)
+	err := DB.C("characters").Find(bson.M{"_id": identifier}).One(&result)
+	if err != nil {
+		fmt.Println("trying pro id")
+		err = DB.C("characters").Find(bson.M{"pro_id": identifier}).One(&result)
 		if err != nil {
-			err = DB.C("characters").Find(bson.M{"pro_id": identifier}).One(&result)
+			fmt.Println("trying number")
+			i, _ := strconv.Atoi(identifier)
+			err = DB.C("characters").Find(bson.M{"number": i}).One(&result)
+			if err != nil {
+				return result, err
+			}
 		}
 	}
 
